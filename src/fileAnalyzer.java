@@ -1,18 +1,25 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class fileAnalyzer extends Thread {
 
     private String filePath;
     private BufferedReader in;
     private int wordsCounter;
-    private int letterCounter;
+    private int lettersCounter;
     private String minWord;
     private String maxWord;
+    public static List<Integer> wordCounterList = Collections.synchronizedList(new ArrayList<>());
+    public static List<Integer> letterCounterList = Collections.synchronizedList(new ArrayList<>());
+    public static List<String> maxWordList = Collections.synchronizedList(new ArrayList<>());
+    public static List<String> minWordList = Collections.synchronizedList(new ArrayList<>());
 
     public fileAnalyzer(String path) throws FileNotFoundException {
         filePath = path;
-        BufferedReader in = new BufferedReader(new FileReader(filePath));
+        FileReader fileReader = new FileReader(filePath);
+        BufferedReader in = new BufferedReader(fileReader);
     }
 
     public void run() {
@@ -20,7 +27,7 @@ public class fileAnalyzer extends Thread {
             String word;
             boolean first = true;
             while ((word = in.readLine()) != null) {
-                letterCounter += word.length();
+                lettersCounter += word.length();
                 wordsCounter++;
                 if (first) {
                     minWord = word;
@@ -34,7 +41,10 @@ public class fileAnalyzer extends Thread {
                     minWord = word;
                 }
             }
-
+            maxWordList.add(maxWord);
+            minWordList.add(minWord);
+            wordCounterList.add(wordsCounter);
+            letterCounterList.add(lettersCounter);
         } catch (FileNotFoundException e) {
             e.getStackTrace();
         } catch (IOException e) {
