@@ -12,25 +12,29 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
         int wordCounter = 0;
         int letterCounter = 0;
-        int avgLetterPerWord = 0;
+        double avgLetterPerWord = 0;
         String minWord = null;
         String maxWord = null;
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        ArrayList<fileAnalyzer> files = new ArrayList<>();
+        ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 1; i <= 20; i++) {
             String path = "C:/Users/hamid/Desktop/ap stuff/ap workshop/fileSearcher/src/assets/";
             path = path + "file_" + i + ".txt";
-            executorService.execute(new fileAnalyzer(path));
+            fileAnalyzer tmp = new fileAnalyzer(path);
+            files.add(tmp);
         }
-
-        executorService.awaitTermination(20, TimeUnit.SECONDS);
-
+        for (fileAnalyzer file : files) {
+            executorService.execute(file);
+        }
+        Thread.sleep(10);
+        executorService.shutdown();
         for (int wordCNT : fileAnalyzer.wordCounterList) {
             wordCounter += wordCNT;
         }
         for (int letterCNT : fileAnalyzer.letterCounterList) {
             letterCounter += letterCNT;
         }
-        avgLetterPerWord = letterCounter / wordCounter;
+        avgLetterPerWord = (double) letterCounter / wordCounter;
         for (String word : fileAnalyzer.minWordList) {
             if (minWord == null) {
                 minWord = word;
@@ -47,8 +51,8 @@ public class Main {
                 maxWord = word;
             }
         }
-
-        System.out.println("number of words : " + wordCounter);
+        System.out.println("number of all words : " + wordCounter);
+        System.out.println("number of not repeated words : " + fileAnalyzer.words.size());
         System.out.println("number of letters : " + letterCounter);
         System.out.println("average length of words : " + avgLetterPerWord);
         System.out.println("word with minimum length : " + minWord);
