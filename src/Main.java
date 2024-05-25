@@ -26,8 +26,8 @@ public class Main {
         for (fileAnalyzer file : files) {
             executorService.execute(file);
         }
-        Thread.sleep(10);
         executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
         for (int wordCNT : fileAnalyzer.wordCounterList) {
             wordCounter += wordCNT;
         }
